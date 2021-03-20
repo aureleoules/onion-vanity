@@ -10,7 +10,7 @@ license = "MIT"
 [dependencies]
 rand = "0.7.0"
 ed25519-dalek = { git = "https://github.com/aureleoules/ed25519-dalek" }
-sha2 = "0.9.3"
+sha3 = "0.9.1"
 data-encoding = "2.3.2"
 hex = "0.4.3"
 clap = "3.0.0-beta.2"

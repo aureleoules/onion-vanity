@@ -5,8 +5,8 @@ use env_logger::Target;
 use hex;
 use log::{debug, info, LevelFilter};
 use rand::rngs::OsRng;
-use sha2::{Digest, Sha256};
-use std::sync::atomic::{AtomicBool, Ordering};
+use sha3::{Digest, Sha3_256};
+use std::{process, sync::atomic::{AtomicBool, Ordering}};
 use std::sync::{Arc, Mutex};
 use std::thread;
 
@@ -36,7 +36,7 @@ fn compute_checksum(pk: &PublicKey) -> Vec<u8> {
     vec.extend_from_slice(&pk.to_bytes());
     vec.push(0x03);
 
-    let mut hasher = Sha256::new();
+    let mut hasher = Sha3_256::new();
     hasher.update(vec);
     let result = hasher.finalize();
 
@@ -103,6 +103,24 @@ fn mine_address(threads: i64, pattern: String) -> (Keypair, String) {
     (key, addr)
 }
 
+fn check_pattern(pattern: &String) -> bool {
+    let alphabet = "abcdefghijklmnopqrstuvwxyz234567";
+    for c in pattern.chars() { 
+        let mut found = false;
+        for c2 in alphabet.chars() {
+            if c == c2 {
+                found = true;
+                break;
+            }
+        }
+        if !found {
+            return false;
+        }
+    }
+    
+    return true;
+}
+
 fn main() {
     let opts: Opts = Opts::parse();
 
@@ -114,7 +132,12 @@ fn main() {
             LevelFilter::Info
         })
         .init();
-    
+
+    if !check_pattern(&opts.pattern) {
+        println!("invalid pattern: {}", opts.pattern);
+        process::exit(1);
+    }
+
     info!("Started mining address: {}", opts.pattern);
     let (keypair, addr) = mine_address(opts.threads, opts.pattern);
 
