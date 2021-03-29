@@ -88,7 +88,12 @@ fn mine_address(threads: i64, pattern: String) -> (Keypair, String) {
     }
 
     let d = Arc::clone(&done);
-    work(pattern, done);
+
+    let (is_done, _) = &*d;
+    ctrlc::set_handler(move || {
+        process::exit(0);
+    }).expect("Error setting Ctrl-C handler");
+    while !is_done.load(Ordering::SeqCst) {}
 
     let b =
         d.1.lock()

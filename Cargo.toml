@@ -16,3 +16,4 @@ hex = "0.4.3"
 clap = "3.0.0-beta.2"
 log = "*"
 env_logger = "*"
+ctrlc = { version = "3.0", features = ["termination"] }
